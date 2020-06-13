@@ -29,6 +29,7 @@ namespace Private_chat_SignalR
             services.AddSignalR();
             services.AddDistributedMemoryCache();
             services.AddRazorPages();
+            services.AddMvc();
 
             services.AddSession(options =>
             {

@@ -26,7 +26,7 @@ namespace Private_chat_SignalR.Hubs
             var currentUser = db.Users.FirstOrDefault(x => x.UserName == user);
 
             //Bu metod bir grup oluşturma metodu. benden bir Connection Id ve grup adı istiyor.Grup adına ChatRoomId vermemin sebebi ise bu ID'nin sadece Online olan kullanıcıya ve mesaj atılan kullanıcıya özel olması.Bu Id'ye sahip olan kullanıcıları bu gruba ekliyor.(Controller kısmına bak)
-           await Groups.AddToGroupAsync(Context.ConnectionId, chatRoomId.ToString());
+           await Groups.AddToGroupAsync(Context.ConnectionId, chatRoomId);
 
             //Burada gerekli database kayıt işlemlerini yapıyorum.
             Message message = new Message
@@ -41,7 +41,7 @@ namespace Private_chat_SignalR.Hubs
             db.SaveChanges();
 
             //Bu metod ise benim mesajı anlık olarak ileten metodum.Benden bir grup adı istiyor. Bunu istemesinin sebebi yollanan mesajı sadece o gruba dahil olan kullanıcılara göstermek.İşte her ChatRoomId'i sadece 2 kullanıcıya bu sebepten dolayı özel kıldık ve yukarıdaki Grup oluşturma metoduna bu sebepten dolayı ChatRoom Id'i verdik.Parametrelerde ise mesaj gönderidkten sonra View sayfasında göstermek istediğim elementler yer alıyor.
-             await Clients.Group(chatRoomId.ToString()).SendAsync("ReceiveMessage", user, content);
+             await Clients.Group(chatRoomId).SendAsync("ReceiveMessage", user, content);
         }
     }
 }

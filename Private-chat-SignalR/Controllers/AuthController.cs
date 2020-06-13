@@ -22,6 +22,7 @@ namespace Private_chat_SignalR.Controllers
         {
             this.db = db;
         }
+        //Kullanıcıları MSSQL Serverdan eklediğim için register metodu yazmadım.
         public IActionResult Login()
         {
             return View();
