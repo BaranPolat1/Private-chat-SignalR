@@ -26,39 +26,65 @@ namespace Private_chat_SignalR.Controllers
         //Mesaj geçmişimi görmek istediğim kullanıcının kullanıcı adını parametre ile metoda yolluyorum.
         public  IActionResult ShowChatRoom(string userName)
         {
-            List<ChatRoom> chatRooms = new List<ChatRoom>();
-            ChatRoom chat = null;
-            //Online olan kullanıcının tüm bilgilerine artık currentUser değişkenimden ulaşacağım.
-            
-            var currentUser =db.Users.FirstOrDefault(x=>x.UserName == HttpContext.Session.GetString("UserName"));
-
-            //Parametreden gelen isime sahip olan kullanıcya artık bu değişkenden ulaşacağım.
-            var user = db.Users.FirstOrDefault(x => x.UserName == userName);
-            ViewBag.UserId = user.Id;
-
-            //ChatRoomUser tablosundan online olan kullanıcının kayıtlarını getirdim.
-            var myChatRoom = db.ChatRoomUsers.Where(x => x.UserId == currentUser.Id).ToList();
-
-            //Online olan kullanıcı, daha önce başka kullanıcılar ile mesajlaşmış mı yoksa mesajlaşmamış mı bunun kontrolünü yapıyorum.
-            if (myChatRoom.Count != 0)
+            using(var transaction = db.Database.BeginTransaction())
             {
-                //Eğer mesajlaşmışsa bu kullanıcının var olan ChatRoomlarını bu listeye aldım.
-                foreach (var item in myChatRoom)
+                try
                 {
-                    chatRooms.AddRange(db.ChatRooms.Where(x => x.Id == item.ChatRoomId));
-                }
+                    List<ChatRoom> chatRooms = new List<ChatRoom>();
+                    ChatRoom chat = null;
+                    //Online olan kullanıcının tüm bilgilerine artık currentUser değişkenimden ulaşacağım.
 
-                //Online olan kullanıcının ChatRoomlarının içinde dolaşıyorum.
-                foreach (var item in chatRooms)
-                {
-                    //Online olan kullanıcı daha önce parametreden gelen kullanıcı ile mesajlaşmış mı? bunun kontrolünü yapıyorum.
-                    if (db.ChatRoomUsers.Any(x=>x.ChatRoomId == item.Id && x.UserId ==user.Id))
+                    var currentUser = db.Users.FirstOrDefault(x => x.UserName == HttpContext.Session.GetString("UserName"));
+
+                    //Parametreden gelen isime sahip olan kullanıcya artık bu değişkenden ulaşacağım.
+                    var user = db.Users.FirstOrDefault(x => x.UserName == userName);
+                    ViewBag.UserId = user.Id;
+
+                    //ChatRoomUser tablosundan online olan kullanıcının kayıtlarını getirdim.
+                    var myChatRoom = db.ChatRoomUsers.Where(x => x.UserId == currentUser.Id).ToList();
+
+                    //Online olan kullanıcı, daha önce başka kullanıcılar ile mesajlaşmış mı yoksa mesajlaşmamış mı bunun kontrolünü yapıyorum.
+                    if (myChatRoom.Count != 0)
                     {
-                        //Eğer mesajlaşmışsa bu iki kullanıcının ortak olan ChatRoomunu getiriyorum(çünkü View kısmında bu ChatRooma ait olan mesjaları lisyeleyeceğim.)
-                        var chatroomuser = myChatRoom.Where(x => x.ChatRoomId == item.Id).FirstOrDefault();
-                        chat = db.ChatRooms.FirstOrDefault(x=>x.Id == chatroomuser.ChatRoomId);
+                        //Eğer mesajlaşmışsa bu kullanıcının var olan ChatRoomlarını bu listeye aldım.
+                        foreach (var item in myChatRoom)
+                        {
+                            chatRooms.AddRange(db.ChatRooms.Where(x => x.Id == item.ChatRoomId));
+                        }
+
+                        //Online olan kullanıcının ChatRoomlarının içinde dolaşıyorum.
+                        foreach (var item in chatRooms)
+                        {
+                            //Online olan kullanıcı daha önce parametreden gelen kullanıcı ile mesajlaşmış mı? bunun kontrolünü yapıyorum.
+                            if (db.ChatRoomUsers.Any(x => x.ChatRoomId == item.Id && x.UserId == user.Id))
+                            {
+                                //Eğer mesajlaşmışsa bu iki kullanıcının ortak olan ChatRoomunu getiriyorum(çünkü View kısmında bu ChatRooma ait olan mesjaları lisyeleyeceğim.)
+                                var chatroomuser = myChatRoom.Where(x => x.ChatRoomId == item.Id).FirstOrDefault();
+                                chat = db.ChatRooms.FirstOrDefault(x => x.Id == chatroomuser.ChatRoomId);
+                            }
+                            //Eğer online olan kullanıcı daha önce hiç parametreden kullanıcı ile mesajlaşmamışsa,bu kullanıcı ile ortak bir ChatRoom yaratıyorum.
+                            else
+                            {
+                                chat = new ChatRoom();
+                                db.ChatRooms.Add(chat);
+                                db.SaveChanges();
+                                ChatRoomUser chatRoomUser = new ChatRoomUser();
+                                chatRoomUser.ChatRoomId = chat.Id;
+                                chatRoomUser.UserId = user.Id;
+                                db.ChatRoomUsers.Add(chatRoomUser);
+                                db.SaveChanges();
+                                ChatRoomUser chatRoomUser2 = new ChatRoomUser();
+                                chatRoomUser2.UserId = currentUser.Id;
+                                chatRoomUser2.ChatRoomId = chat.Id;
+                                db.ChatRoomUsers.Add(chatRoomUser2);
+                                db.SaveChanges();
+                                transaction.Commit();
+
+                            }
+                        }
+                       
                     }
-                    //Eğer online olan kullanıcı daha önce hiç parametreden kullanıcı ile mesajlaşmamışsa,bu kullanıcı ile ortak bir ChatRoom yaratıyorum.
+                    //Eğer online olan kullanıcı daha önce kimseyle mesajlaşmamış ise, parametreden gelen kullanıcı ile ortak bir ChatRoom yaratıyorum.
                     else
                     {
                         chat = new ChatRoom();
@@ -74,32 +100,23 @@ namespace Private_chat_SignalR.Controllers
                         chatRoomUser2.ChatRoomId = chat.Id;
                         db.ChatRoomUsers.Add(chatRoomUser2);
                         db.SaveChanges();
-                        
+                        transaction.Commit();
+                       
                     }
+                    return View(chat);
                 }
-                return View(chat);
-            }
-            //Eğer online olan kullanıcı daha önce kimseyle mesajlaşmamış ise, parametreden gelen kullanıcı ile ortak bir ChatRoom yaratıyorum.
-            else
-            {
-                chat = new ChatRoom();
-                db.ChatRooms.Add(chat);
-                db.SaveChanges();
-                ChatRoomUser chatRoomUser = new ChatRoomUser();
-                chatRoomUser.ChatRoomId = chat.Id;
-                chatRoomUser.UserId = user.Id;
-                db.ChatRoomUsers.Add(chatRoomUser);
-                db.SaveChanges();
-                ChatRoomUser chatRoomUser2 = new ChatRoomUser();
-                chatRoomUser2.UserId = currentUser.Id;
-                chatRoomUser2.ChatRoomId = chat.Id;
-                db.ChatRoomUsers.Add(chatRoomUser2);
-                db.SaveChanges();
-                return View(chat);
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+              
+
+
             }
 
-            
-            
+
+
         }
        
     }
