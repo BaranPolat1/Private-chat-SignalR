@@ -35,9 +35,10 @@
         </ul>
     </div>
 </div>
-<input value="@ViewBag.UserId" id="recipient" />
-<input value="@Model.Id" id="group" />
-<input id="userInput" value="@user" />
+
+<input value="@ViewBag.UserId" id="recipient" type="hidden" />
+<input value="@Model.Id" id="group" type="hidden" />
+<input id="userInput" value="@user" type="hidden"/>
 
 @section Scripts{
 

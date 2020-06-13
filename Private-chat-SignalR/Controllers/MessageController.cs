@@ -23,7 +23,7 @@ namespace Private_chat_SignalR.Controllers
             this.db = db;
         }
         
-        //Mesaj geçmişimi görmek istediğim kullanıcının kullanıcı adını parametre ile metoda yolluyorum.
+        //Mesajlaşmak istediğim kullanıcının kullanıcı adını parametre ile metoda yolluyorum.
         public  IActionResult ShowChatRoom(string userName)
         {
             using(var transaction = db.Database.BeginTransaction())
@@ -32,12 +32,15 @@ namespace Private_chat_SignalR.Controllers
                 {
                     List<ChatRoom> chatRooms = new List<ChatRoom>();
                     ChatRoom chat = null;
-                    //Online olan kullanıcının tüm bilgilerine artık currentUser değişkenimden ulaşacağım.
 
+                    //Online olan kullanıcının tüm bilgilerine artık currentUser değişkenimden ulaşacağım.
                     var currentUser = db.Users.FirstOrDefault(x => x.UserName == HttpContext.Session.GetString("UserName"));
+
 
                     //Parametreden gelen isime sahip olan kullanıcya artık bu değişkenden ulaşacağım.
                     var user = db.Users.FirstOrDefault(x => x.UserName == userName);
+                    
+                    //Razor Page'da bu kullanıcının ID bilgisini tutmam gerek.
                     ViewBag.UserId = user.Id;
 
                     //ChatRoomUser tablosundan online olan kullanıcının kayıtlarını getirdim.
@@ -53,13 +56,14 @@ namespace Private_chat_SignalR.Controllers
                         }
 
                         //Online olan kullanıcının ChatRoomlarının içinde dolaşıyorum.
-                        foreach (var item in chatRooms)
+                        foreach (var chatroom in chatRooms)
                         {
                             //Online olan kullanıcı daha önce parametreden gelen kullanıcı ile mesajlaşmış mı? bunun kontrolünü yapıyorum.
-                            if (db.ChatRoomUsers.Any(x => x.ChatRoomId == item.Id && x.UserId == user.Id))
+                            if (db.ChatRoomUsers.Any(x => x.ChatRoomId == chatroom.Id && x.UserId == user.Id))
                             {
-                                //Eğer mesajlaşmışsa bu iki kullanıcının ortak olan ChatRoomunu getiriyorum(çünkü View kısmında bu ChatRooma ait olan mesjaları lisyeleyeceğim.)
-                                var chatroomuser = myChatRoom.Where(x => x.ChatRoomId == item.Id).FirstOrDefault();
+                                //Eğer mesajlaşmışsa bu iki kullanıcının ortak olan ChatRoomunu getiriyorum(çünkü View kısmında bu ChatRoomu listeleyeceğim.)
+                                var chatroomuser = myChatRoom.Where(x => x.ChatRoomId == chatroom.Id).FirstOrDefault();
+                                //Ortak olan ChatRoomu bulduk.
                                 chat = db.ChatRooms.FirstOrDefault(x => x.Id == chatroomuser.ChatRoomId);
                             }
                             //Eğer online olan kullanıcı daha önce hiç parametreden kullanıcı ile mesajlaşmamışsa,bu kullanıcı ile ortak bir ChatRoom yaratıyorum.
@@ -103,6 +107,7 @@ namespace Private_chat_SignalR.Controllers
                         transaction.Commit();
                        
                     }
+                    //ChatRoomu view sayfamda gösteriyorum.
                     return View(chat);
                 }
                 catch (Exception)
