@@ -1,6 +1,8 @@
+Proje altyapýsý, bir web sitesinde kullanýcýlarýn tam anlamýyla birbirleri ile canlý ve özel mesajlaþmasýný saðlamak için tasarlanmýþtýr. Kolayca entegre edilebilir.
 Gerekli olan Script dosyalarý için : https://docs.microsoft.com/tr-tr/aspnet/core/tutorials/signalr?view=aspnetcore-3.1&tabs=visual-studio
 Nuget Pacgake Manager vasýtasýyla Microsoft.AspNet.SignalR.Core paketi yüklenmelidir.
 Projede Lazy Loading kullanýlmýþtýr. Eager Loading ile çalýþacak olanlar 6. Adýmý kendilerine göre düzenlemelidir.
+
 
 1.Models klasörünün altýna ORM adýnda klasör açýlýr:
             1.1.ORM klasörünün altýna Entity ve Context adýndan 2 klasör açýlýr.
