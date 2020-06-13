@@ -1,0 +1,48 @@
+﻿@using Microsoft.AspNetCore.Http;
+@model Private_chat_SignalR.Models.ORM.Entity.ChatRoom
+@{
+    ViewData["Title"] = "ShowChatRoom";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var user = Context.Session.GetString("UserName");
+}
+
+
+<div class="container">
+    <div class="row">&nbsp;</div>
+    <div class="row">
+        <div class="col-2">Message</div>
+        <div class="col-4"><input type="text" id="messageInput" /></div>
+    </div>
+    <div class="row">&nbsp;</div>
+    <div class="row">
+        <div class="col-6">
+            <input type="button" id="sendButton" value="Send Message" />
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <hr />
+    </div>
+</div>
+<div class="row">
+    <div class="col-6">
+        <ul id="messagesList">
+            @foreach (var item in Model.Messages)
+            {
+                <li><b>@item.SenderUser.UserName:</b>@item.Content</li>
+            }
+        </ul>
+    </div>
+</div>
+<input value="@ViewBag.UserId" id="recipient" />
+<input value="@Model.Id" id="group" />
+<input id="userInput" value="@user" />
+
+@section Scripts{
+
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/chat.js"></script>
+}
+
+
