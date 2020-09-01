@@ -1,16 +1,20 @@
-Proje altyapısı, bir web sitesinde kullanıcıların tam anlamıyla birbirleri ile canlı ve özel mesajlaşmasını sağlamak için tasarlanmıştır. Kolayca entegre edilebilir.
-Gerekli olan Script dosyaları için : https://docs.microsoft.com/tr-tr/aspnet/core/tutorials/signalr?view=aspnetcore-3.1&tabs=visual-studio
-Nuget Pacgake Manager vasıtasıyla Microsoft.AspNet.SignalR.Core paketi yüklenmelidir.
-Projede Lazy Loading kullanılmıştır. Eager Loading ile çalışacak olanlar 6. Adımı kendilerine göre düzenlemelidir.
+Proje altyapÄ±sÄ±, bir web sitesinde kullanÄ±cÄ±larÄ±n tam anlamÄ±yla birbirleri ile canlÄ± ve Ã¶zel mesajlaÅŸmasÄ±nÄ± saÄŸlamak iÃ§in tasarlanmÄ±ÅŸtÄ±r. Kolayca entegre edilebilir.
+Gerekli olan Script dosyalarÄ± iÃ§in : https://docs.microsoft.com/tr-tr/aspnet/core/tutorials/signalr?view=aspnetcore-3.1&tabs=visual-studio
+Nuget Pacgake Manager vasÄ±tasÄ±yla Microsoft.AspNet.SignalR.Core paketi yÃ¼klenmelidir.
+Projede Lazy Loading kullanÄ±lmÄ±ÅŸtÄ±r. Eager Loading ile Ã§alÄ±ÅŸacak olanlar 6. AdÄ±mÄ± kendilerine gÃ¶re dÃ¼zenlemelidir.
 
 
-1.Models klasörünün altına ORM adında klasör açılır:
-            1.1.ORM klasörünün altına Entity ve Context adından 2 klasör açılır.
-            1.2 Entity klasörüne "User","Message","ChatRoom","ChatRoomUser" isminde 4 sınıf eklenir ve bu sınıflar arasındaki bağlantılar kurulur.
-            1.3 Context klasörüne "ProjectContext" adında sınıf eklenir ve Database connection işlemleri yapılır.
+1.Models klasÃ¶rÃ¼nÃ¼n altÄ±na ORM adÄ±nda klasÃ¶r aÃ§Ä±lÄ±r:
+            1.1.ORM klasÃ¶rÃ¼nÃ¼n altÄ±na Entity ve Context adÄ±ndan 2 klasÃ¶r aÃ§Ä±lÄ±r.
+            1.2 Entity klasÃ¶rÃ¼ne "User","Message","ChatRoom","ChatRoomUser" isminde 4 sÄ±nÄ±f eklenir ve bu sÄ±nÄ±flar arasÄ±ndaki baÄŸlantÄ±lar kurulur.
+            1.3 Context klasÃ¶rÃ¼ne "ProjectContext" adÄ±nda sÄ±nÄ±f eklenir ve Database connection iÅŸlemleri yapÄ±lÄ±r.
+            
+2.Solution'a "Hubs" adÄ±nda klasÃ¶r eklenir.
+            2.1 Bu klasÃ¶r altÄ±na "ChatHub" adÄ±nda sÄ±nÄ±f eklenir ve bu sÄ±nÄ±f "Hub" sÄ±nÄ±fÄ±ndan miras alÄ±r.
+              
          
-2.Startup.cs sınıfında şu değişiklikler yapılır:
-            2.1. 
+3.Startup.cs sÄ±nÄ±fÄ±nda ÅŸu deÄŸiÅŸiklikler yapÄ±lÄ±r:
+           3.1. 
             public void ConfigureServices(IServiceCollection services)
              {
             services.AddControllersWithViews();
@@ -27,7 +31,7 @@ Projede Lazy Loading kullanılmıştır. Eager Loading ile çalışacak olanlar 6. Adım
             });
          }
           
-          2.2
+          3.2
             public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ProjectContext dbContext)
         {
             if (env.IsDevelopment())
@@ -53,32 +57,31 @@ Projede Lazy Loading kullanılmıştır. Eager Loading ile çalışacak olanlar 6. Adım
              });
         }
        
-3.Package Manager Console açılır ve sırasıyla şu işlemler yapılır:
-                  3.1 Add-Migration InitialCreate
-                  3.2 update-database
+4.Package Manager Console aÃ§Ä±lÄ±r ve sÄ±rasÄ±yla ÅŸu iÅŸlemler yapÄ±lÄ±r:
+                 4.1 Add-Migration InitialCreate
+                 4.2 update-database
         
-4. Models klasörünğn altına "VM" adında klasör açılır:
-                  4.1 "VM" klasörünün altına RegisterVM ve LoginVM adında 2 sınıf eklenir.
-                  4.2 RegisterVM sınıfında kullanıcıların kayıt olması için istenilen propertyler yazılır.
-                  4.3 LoginVM sınıfında kullanıcıların login olması içim gerkeli propertyler yazılır.
+5. Models klasÃ¶rÃ¼nÄŸn altÄ±na "VM" adÄ±nda klasÃ¶r aÃ§Ä±lÄ±r:
+                  5.1 "VM" klasÃ¶rÃ¼nÃ¼n altÄ±na RegisterVM ve LoginVM adÄ±nda 2 sÄ±nÄ±f eklenir.
+                  5.2 RegisterVM sÄ±nÄ±fÄ±nda kullanÄ±cÄ±larÄ±n kayÄ±t olmasÄ± iÃ§in istenilen propertyler yazÄ±lÄ±r.
+                  5.3 LoginVM sÄ±nÄ±fÄ±nda kullanÄ±cÄ±larÄ±n login olmasÄ± iÃ§im gerkeli propertyler yazÄ±lÄ±r.
          
-5.Controllers klasörüne AuthController adında controller eklenir:
-                  5.1 Register ve Login işlemlerini yapacak metodlar yazılır.
-                  5.2 Register ve Login sayfları oluşturulur.
+6.Controllers klasÃ¶rÃ¼ne AuthController adÄ±nda controller eklenir:
+                  6.1 Register ve Login iÅŸlemlerini yapacak metodlar yazÄ±lÄ±r.
+                  6.2 Register ve Login sayflarÄ± oluÅŸturulur.
                   
-6.Controllers klasörüne MessageController adında controller eklenir:
-                  6.1 Kullanıcıların mesajlarını gösterme işlemini yapacak olan "ShowChatRoom" metodu yazılır.
-                  6.2 "ShowChatRoom"un üzerine sağ tıklanır sırasıyla Add View > Razor View varsa LayoutPage eklenir ve sayfa oluşturulur.
-         
-7.Solution'a "Hubs" adında klasör eklenir.
-                  7.1 Bu klasör altına "ChatHub" adında sınıf eklenir ve bu sınıf "Hub" sınıfından miras alır.
-                  7.2 Bu sınıfta kullanıcıların anlık mesajlaşmasını sağlayacak olan "Send" metodu yazılır.
+7.Controllers klasÃ¶rÃ¼ne MessageController adÄ±nda controller eklenir:
+                  7.1 KullanÄ±cÄ±larÄ±n mesajlarÄ±nÄ± gÃ¶sterme iÅŸlemini yapacak olan "ShowChatRoom" metodu yazÄ±lÄ±r.
+                  7.2 "ShowChatRoom"un Ã¼zerine saÄŸ tÄ±klanÄ±r sÄ±rasÄ±yla Add View > Razor View varsa LayoutPage eklenir ve sayfa oluÅŸturulur.
+ 
+8.Hub sÄ±nÄ±fÄ±na kullanÄ±cÄ±larÄ±n anlÄ±k mesajlaÅŸmasÄ±nÄ± saÄŸlayacak olan "Send" metodu yazÄ±lÄ±r. 
+
                   
-8.Views > Message > ShowChatRoom sayfası açılır:
-                  8.1 Sayfanın modeline "ChatRoom" sınıfı referans verilir.
-                  8.2 Mesajlaşma sayfasının tasarımı yapılır.
-                  8.3 Sayfaya "signalr.js" ve "chat.js" script dosyaları referans verilir.
-                  8.4 "chat.js" script dosyası sayfa tasarımına ve ChatHub sınıfına göre yeniden yapılandırılır.
+9.Views > Message > ShowChatRoom sayfasÄ± aÃ§Ä±lÄ±r:
+                  9.1 SayfanÄ±n modeline "ChatRoom" sÄ±nÄ±fÄ± referans verilir.
+                  9.2 MesajlaÅŸma sayfasÄ±nÄ±n tasarÄ±mÄ± yapÄ±lÄ±r.
+                  9.3 Sayfaya "signalr.js" ve "chat.js" script dosyalarÄ± referans verilir.
+                  9.4 "chat.js" script dosyasÄ± sayfa tasarÄ±mÄ±na ve ChatHub sÄ±nÄ±fÄ±na gÃ¶re yeniden yapÄ±landÄ±rÄ±lÄ±r.
                   
       
                   
